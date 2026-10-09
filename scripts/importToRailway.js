@@ -23,6 +23,7 @@ async function runImport() {
       uri: connectionUrl,
       multipleStatements: true,
       charset: 'utf8mb4',
+      ssl: { rejectUnauthorized: false },
     };
   } else {
     const host = process.env.CLOUD_DB_HOST || process.env.DB_HOST;
@@ -57,9 +58,42 @@ async function runImport() {
 
   let connection;
   try {
-    console.log('[Connecting] Menghubungkan ke database cloud...');
-    connection = await mysql.createConnection(connectionConfig);
+    let parsedTargetDb = null;
+    let baseConfig = { ...connectionConfig };
+
+    if (connectionUrl) {
+      try {
+        const u = new URL(connectionUrl);
+        parsedTargetDb = u.pathname.replace(/^\//, '') || null;
+        // Connect initially to default root without specific DB to ensure target DB exists
+        const baseUrl = new URL(connectionUrl);
+        baseUrl.pathname = '/';
+        baseConfig = {
+          uri: baseUrl.toString(),
+          multipleStatements: true,
+          charset: 'utf8mb4',
+          ssl: { rejectUnauthorized: false },
+        };
+      } catch (e) {
+        // Fallback to original config if URL parsing fails
+      }
+    }
+
+    console.log('[Connecting] Menghubungkan ke server MySQL cloud...');
+    try {
+      connection = await mysql.createConnection(baseConfig);
+    } catch (err) {
+      // If root connection without DB fails, try original connectionConfig
+      connection = await mysql.createConnection(connectionConfig);
+    }
     console.log('[Connected] Berhasil terhubung ke database cloud!\n');
+
+    if (parsedTargetDb) {
+      console.log(`[Database] Memastikan database '${parsedTargetDb}' tersedia...`);
+      await connection.query(`CREATE DATABASE IF NOT EXISTS \`${parsedTargetDb}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`);
+      await connection.query(`USE \`${parsedTargetDb}\`;`);
+      console.log(`[Database] Menggunakan database '${parsedTargetDb}'.\n`);
+    }
 
     console.log('[Executing] Mengimpor tabel dan data seed ke Railway...');
     await connection.query(sqlContent);
