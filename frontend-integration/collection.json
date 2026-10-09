@@ -1,0 +1,896 @@
+{
+  "info": {
+    "name": "Permata Sakinah REST API Collection",
+    "_postman_id": "2d167e6d-879b-492a-90d9-8f87d4c8e0ed",
+    "description": "Postman Collection resmi untuk integrasi Frontend Permata Sakinah dengan Backend REST API (Node.js + Express + MySQL).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "00. Health Check",
+      "item": [
+        {
+          "name": "Get API Health Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "01. Auth",
+      "item": [
+        {
+          "name": "Login (Owner / Admin / Staff / Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data && jsonData.data.token) {",
+                  "    pm.collectionVariables.set('authToken', jsonData.data.token);",
+                  "    console.log('authToken saved successfully:', jsonData.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@permatasakinah.test\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Authenticated Profile (Me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02. Projects",
+      "item": [
+        {
+          "name": "Get All Projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Project by ID or Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/permata-sakinah-1-cihanjuang",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "permata-sakinah-1-cihanjuang"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Project (Admin/Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Permata Sakinah 3 - Padalarang\",\n  \"slug\": \"permata-sakinah-3-padalarang\",\n  \"description\": \"Kavling asri siap bangun dekat stasiun kereta cepat.\",\n  \"location_text\": \"Padalarang, Bandung Barat\",\n  \"address\": \"Jl. Raya Padalarang No. 10\",\n  \"status\": \"ACTIVE\",\n  \"cover_image_url\": \"https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Project (Admin/Owner)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Deskripsi kavling diperbarui dengan fasilitas lengkap.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03. Plots & Lots",
+      "item": [
+        {
+          "name": "Get Plots (With Filters)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/plots?projectId=1&status=AVAILABLE",
+              "host": ["{{baseUrl}}"],
+              "path": ["plots"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "1"
+                },
+                {
+                  "key": "status",
+                  "value": "AVAILABLE"
+                },
+                {
+                  "key": "block",
+                  "value": "Blok A",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "A-01",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Plots by Project ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/1/plots",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "1", "plots"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Plot Detail by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/plots/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["plots", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Plot (Admin/Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"project_id\": 1,\n  \"plot_code\": \"A-05\",\n  \"block_name\": \"Blok A\",\n  \"area_sqm\": 84.00,\n  \"price\": 252000000,\n  \"status\": \"AVAILABLE\",\n  \"site_x\": 0.52,\n  \"site_y\": 0.25,\n  \"description\": \"Kavling hadap timur\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/plots",
+              "host": ["{{baseUrl}}"],
+              "path": ["plots"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Plot (Admin/Staff)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 255000000,\n  \"description\": \"Kavling hook view taman\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/plots/4",
+              "host": ["{{baseUrl}}"],
+              "path": ["plots", "4"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04. Customers & Leads",
+      "item": [
+        {
+          "name": "Get All Customers (Staff/Admin/Owner)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers?lead_status=INTERESTED",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers"],
+              "query": [
+                {
+                  "key": "lead_status",
+                  "value": "INTERESTED"
+                },
+                {
+                  "key": "search",
+                  "value": "Budi",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Customer Detail by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Customer / Lead (Staff/Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Irvan Pratama\",\n  \"phone\": \"081299887766\",\n  \"email\": \"irvan.pratama@example.test\",\n  \"address\": \"Jl. Gatot Subroto No. 44, Bandung\",\n  \"lead_status\": \"NEW\",\n  \"source\": \"LANDING_PAGE\",\n  \"notes\": \"Minat kavling hook Cihanjuang\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Customer (Staff/Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lead_status\": \"INTERESTED\",\n  \"notes\": \"Sudah survey lokasi dan cocok\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customers/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Customer Lead Activities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/2/activities",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers", "2", "activities"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Customer Lead Activity (Staff)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activity_type\": \"WHATSAPP\",\n  \"description\": \"Kirim penawaran simulasi harga dan info diskon promo\",\n  \"follow_up_at\": \"2026-10-15 10:00:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customers/2/activities",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers", "2", "activities"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05. Bookings",
+      "item": [
+        {
+          "name": "Get All Bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bookings?status=ACTIVE",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Booking by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bookings/2",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", "2"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Booking (POS / Internal / Customer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": 2,\n  \"plot_id\": 3,\n  \"booking_fee\": 5000000,\n  \"expires_in_days\": 7,\n  \"notes\": \"Booking kavling A-03 via POS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Booking (Release Plot)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Customer membatalkan pengajuan\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings/4/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", "4", "cancel"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06. Sales & POS",
+      "item": [
+        {
+          "name": "Get All Sales / Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales?status=CONFIRMED",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "CONFIRMED"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sale by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Sale (POS Transaction)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": 2,\n  \"plot_id\": 2,\n  \"booking_id\": 2,\n  \"discount_amount\": 2000000,\n  \"status\": \"PENDING_PAYMENT\",\n  \"notes\": \"Konversi booking aktif A-02 ke transaksi POS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sales",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm Sale (Admin/Owner -> Plot turns to SOLD)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/1/confirm",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "1", "confirm"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "07. Payments",
+      "item": [
+        {
+          "name": "Get All Payments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payments?status=VERIFIED",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "VERIFIED"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Payment by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payments/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Payment (Linked to Sale or Booking)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": 2,\n  \"amount\": 5000000,\n  \"method\": \"BANK_TRANSFER\",\n  \"reference_number\": \"TRF-MANDIRI-554433\",\n  \"proof_url\": \"https://images.unsplash.com/photo-1554224155-8d04cb21cd6c\",\n  \"notes\": \"Pembayaran tanda jadi booking\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Payment (Admin/Owner)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payments/3/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments", "3", "verify"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Payment (Admin/Owner)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Bukti transfer tidak terbaca / dana belum masuk rekening\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments/3/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments", "3", "reject"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "08. Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Summary KPI",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "summary"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Dashboard Lot Status Breakdown",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/lot-status",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "lot-status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Dashboard Recent Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/recent-transactions?limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "recent-transactions"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "09. Reports (Owner & Admin)",
+      "item": [
+        {
+          "name": "Get Sales Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/sales",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "sales"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Payments Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "payments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Plots Inventory Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/plots",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "plots"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
