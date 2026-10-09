@@ -8,7 +8,8 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "test": "node tests/health.test.js && node tests/auth.test.js && node tests/api.test.js",
-    "seed:passwords": "node scripts/seedDevPasswords.js"
+    "seed:passwords": "node scripts/seedDevPasswords.js",
+    "db:import-railway": "node scripts/importToRailway.js"
   },
   "keywords": [
     "express",
