@@ -6,10 +6,11 @@ Dokumen ini adalah acuan resmi bagi tim Frontend untuk mengintegrasikan antarmuk
 
 ## 1. Arsitektur & Informasi Koneksi
 
-* **Base URL Backend:** `http://localhost:5000/api/v1`
+* **Base URL Backend (Produksi - Vercel):** `https://kavling-permata-sakinah-api.vercel.app/api/v1`
+* **Base URL Backend (Lokal):** `http://localhost:5000/api/v1`
 * **Format Payload:** `application/json` (UTF-8)
-* **Protokol:** HTTP/1.1 (HTTPS pada deployment produksi)
-* **CORS:** Diizinkan untuk origin frontend `http://localhost:5173`
+* **Protokol:** HTTPS (Produksi) / HTTP (Lokal)
+* **CORS:** Diizinkan untuk origin frontend (`*` atau domain frontend)
 * **Koleksi Postman:** File siap pakai tersedia di `frontend-integration/collection.json`
 
 ---
@@ -502,7 +503,8 @@ Untuk menggantikan `adapter.js` mock pada frontend, gunakan helper sederhana ber
 
 ```javascript
 // src/services/api/client.js
-const API_BASE_URL = 'http://localhost:5000/api/v1';
+// Disarankan menggunakan environment variable Vite: import.meta.env.VITE_API_BASE_URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://kavling-permata-sakinah-api.vercel.app/api/v1';
 
 export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem('token');

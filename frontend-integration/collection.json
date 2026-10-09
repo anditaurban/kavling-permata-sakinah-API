@@ -8,7 +8,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:5000/api/v1",
+      "value": "https://kavling-permata-sakinah-api.vercel.app/api/v1",
       "type": "string"
     },
     {
